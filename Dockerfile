@@ -11,9 +11,10 @@ RUN mv apache-tomcat-7.0.109/* /opt/tomcat/
 WORKDIR /opt/tomcat/webapps
 RUN curl -O https://github.com/AKSarav/SampleWebApp/raw/master/dist/SampleWebApp.war
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+COPY ./webapp.war /usr/local/tomcat/webapps
 # Set environment variables
 ENV CATALINA_HOME /opt/tomcat
 ENV PATH $CATALINA_HOME/bin:$PATH
 # Expose Tomcat port
 EXPOSE 8080
-COPY ./webapp.war /usr/local/tomcat/webapps
+

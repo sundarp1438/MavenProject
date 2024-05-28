@@ -6,13 +6,7 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-server'
-	APP_NAME = "register-app-pipeline"
-        RELEASE = "1.0.0"
-        DOCKER_USER = "sundarp1985"
-        DOCKER_PASS = 'docker'
-        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-	JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+	
     }
     stages {
         stage('Workspace Cleaning'){
@@ -93,21 +87,15 @@ pipeline{
                 }
             }
         }
-       stage("Build & Push Docker Image") {
+       stage('Push Image To Dockerhub') {
             steps {
-                script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                    }
-
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
-                    }
+                script{
+                    withCredentials([string(credentialsId: 'DockerHubPass', variable: 'DockerHubPass')]) {
+                    sh 'docker login -u sundarp1985 --password ${DockerHubPass}' }
+                    sh 'docker push sundarp1985/maven-app-pipeline:latest'
                 }
             }
-
-       }
+        }    
       
         stage("TRIVY Image Scan"){
             steps{

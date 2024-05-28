@@ -33,7 +33,7 @@ pipeline{
         stage("Sonarqube Analysis"){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-server -Dsonar.projectName=Maven-App \
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Maven-App \
                     -Dsonar.projectKey=Maven-App \
                     '''
                 }

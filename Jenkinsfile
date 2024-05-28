@@ -30,15 +30,15 @@ pipeline{
                  sh "mvn test"
            }
        }
-        stage("Sonarqube Analysis"){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Maven-App \
-                    -Dsonar.projectKey=Maven-App \
-                    '''
-                }
-            }
-        }
+        stage("SonarQube Analysis"){
+           steps {
+	           script {
+		        withSonarQubeEnv(credentialsId: 'sonar-token') { 
+                        sh "mvn sonar:sonar"
+		        }
+	           }	
+           }
+       }
         stage("Quality Gate"){
            steps {
                 script {
@@ -78,7 +78,7 @@ pipeline{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
                        sh "docker system prune -f"
                        sh "docker container prune -f"
-                       sh "docker build -t sundarp1985/tomcat-app-pipeline:latest ."
+                       sh "docker build -t sundarp1985/maven-app-pipeline:latest ."
                     }
                 }
             }
@@ -86,7 +86,7 @@ pipeline{
       stage('Containerize And Test') {
             steps {
                 script{
-                    sh 'docker run -d --name tomcat-app sundarp1985/tomcat-app-pipeline:latest && sleep 10 && docker stop tomcat-app'
+                    sh 'docker run -d --name maven-app sundarp1985/maven-app-pipeline:latest && sleep 10 && docker stop maven-app'
                 }
             }
         }
@@ -94,8 +94,8 @@ pipeline{
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker tag tomcat sundarp1985/tomcat-app-pipeline:latest "
-                       sh "docker push sundarp1985/tomcat-app-pipeline:latest"
+                       sh "docker tag maven sundarp1985/maven-app-pipeline:latest "
+                       sh "docker push sundarp1985/maven-app-pipeline:latest"
                     }
                 }
             }
@@ -103,7 +103,7 @@ pipeline{
       
         stage("TRIVY Image Scan"){
             steps{
-                sh "trivy image sundarp1985/tomcat-app:latest > trivyimage.txt" 
+                sh "trivy image sundarp1985/maven-app:latest > trivyimage.txt" 
             }
         }
       stage('post-build step') {

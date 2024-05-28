@@ -72,17 +72,13 @@ pipeline{
                 sh "trivy fs . > trivyfs.txt"
             }
         }
-        stage("Docker Image Build"){
-            steps{
+        stage('Build Docker Image') {
+            steps {
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker system prune -f"
-                       sh "docker container prune -f"
-                       sh "docker build -t sundarp1985/maven-app-pipeline:latest ."
-                    }
-                }
+                    sh 'docker build -t sundarp1985/maven-app-pipeline:latest .'
             }
         }
+    }
       stage('Containerize And Test') {
             steps {
                 script{
@@ -90,20 +86,19 @@ pipeline{
                 }
             }
         }
-        stage("Docker Image Pushing"){
-            steps{
+        s stage('Push Image To Dockerhub') {
+            steps {
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker tag maven sundarp1985/maven-app-pipeline:latest "
-                       sh "docker push sundarp1985/maven-app-pipeline:latest"
-                    }
+                    withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
+                    sh 'docker login -u sundarp1985 --password ${docker}' }
+                    sh 'docker push sundarp1985/maven-app-pipeline:latest'
                 }
             }
-        }
+        }    
       
         stage("TRIVY Image Scan"){
             steps{
-                sh "trivy image sundarp1985/maven-app:latest > trivyimage.txt" 
+                sh "trivy image sundarp1985/maven-app-pipeline:latest > trivyimage.txt" 
             }
         }
       stage('post-build step') {

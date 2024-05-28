@@ -89,8 +89,8 @@ pipeline{
         s stage('Push Image To Dockerhub') {
             steps {
                 script{
-                    withCredentials([string(credentialsId: 'DockerHubPass', variable: 'DockerHubPass')]) {
-                    sh 'docker login -u sundarp1985 --password ${DockerHubPass}' }
+                    withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
+                    sh 'docker login -u sundarp1985 --password ${docker}' }
                     sh 'docker push sundarp1985/maven-app-pipeline:latest'
                 }
             }

@@ -14,7 +14,7 @@ spec:
   spec:
    containers:
    - name: my-app
-     image: docker.io/goudsagar/webapp-app-tomcat:latest
+     image: docker.io/sundarp1985/tomcat-app-pipeline:latest
      imagePullPolicy: IfNotPresent
      ports:
      - containerPort: 8080

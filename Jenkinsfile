@@ -86,7 +86,7 @@ pipeline{
                 }
             }
         }
-        s stage('Push Image To Dockerhub') {
+        stage('Push Image To Dockerhub') {
             steps {
                 script{
                     withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
